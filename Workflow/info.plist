@@ -116,22 +116,42 @@
 				<key>escaping</key>
 				<integer>68</integer>
 				<key>script</key>
-				<string>function run(argv) {
-	const [source, toggle_to] = argv[0].split('|')
+				<string>function locale() {
+  const app = Application.currentApplication()
+  app.includeStandardAdditions = true
 
-	const system_preferences = Application('System Preferences')
-	const system_events = Application('System Events')
-	const prefs_running = system_preferences.running()
+  return app.systemInfo().userLocale.split("_")[0]
+}
 
-	system_preferences.panes.byId('com.apple.preference.battery').anchors.byName(source).reveal()
+function run(argv) {
+  const [source, toggle_to] = argv[0].split("|")
 
-	delay(2) // Give the pane time to load
+  const system_preferences = Application("System Preferences")
+  const system_events = Application("System Events")
+  const prefs_running = system_preferences.running()
 
-	const toggle_checkbox = system_events.processes.byName('System Preferences').windows.byName('Battery').groups[0].checkboxes.byName('Low power mode')
+  system_preferences.panes.byId("com.apple.preference.battery").anchors.byName(source).reveal()
 
-	if (toggle_checkbox.value() === 0 &amp;&amp; toggle_to === 'on' || toggle_checkbox.value() === 1 &amp;&amp; toggle_to === 'off') toggle_checkbox.click()
+  delay(2) // Give the pane time to load
 
-	if (!prefs_running) system_preferences.quit()
+  // Checkbox and window name depend on system language
+  const toggle_checkbox = (function() {
+    const windows = system_events.processes.byName("System Preferences").windows
+
+    switch (locale()) {
+      case "en": return windows.byName("Battery").groups[0].checkboxes.byName("Low power mode")
+      case "de": return windows.byName("Batterie").groups[0].checkboxes.byName("Stromsparmodus")
+      case "es": return windows.byName("Batería").groups[0].checkboxes.byName("Modo de bajo consumo")
+      case "fr": return windows.byName("Batterie").groups[0].checkboxes.byName("Mode économie d’énergie")
+      case "nl": return windows.byName("Batterij").groups[0].checkboxes.byName("Energiebesparingsmodus")
+      case "pt": return windows.byName("Bateria").groups[0].checkboxes.byName("Modo de baixo consumo")
+      default: return windows[0].groups[0].checkboxes[-1].click()
+    }
+  })()
+
+  if (toggle_checkbox.value() === 0 &amp;&amp; toggle_to === "on" || toggle_checkbox.value() === 1 &amp;&amp; toggle_to === "off") toggle_checkbox.click()
+
+  if (!prefs_running) system_preferences.quit()
 }</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -480,7 +500,7 @@ fi</string>
 
 The External and Hotkey Triggers allow you to set it programatically.
 
-Lower Power Mode is a macOS feature, availble on macOS Monterey and [supported Macs](https://www.apple.com/macos/monterey/features/#footnote-16).</string>
+Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported Macs](https://www.apple.com/macos/monterey/features/#footnote-16).</string>
 	<key>uidata</key>
 	<dict>
 		<key>09F16EEE-6DBF-4559-87E0-EBCF59F92293</key>
@@ -556,10 +576,8 @@ Lower Power Mode is a macOS feature, availble on macOS Monterey and [supported M
 			<integer>470</integer>
 		</dict>
 	</dict>
-	<key>variablesdontexport</key>
-	<array/>
 	<key>version</key>
-	<string>2021.1</string>
+	<string>2022.1</string>
 	<key>webaddress</key>
 	<string>https://github.com/alfredapp/low-power-mode-workflow/</string>
 </dict>

@@ -10,7 +10,7 @@ Run `lpm` to view the current state of and toggle Low Power Mode for either your
 
 The External and Hotkey Triggers allow you to set it programatically.
 
-Lower Power Mode is a macOS feature, availble on macOS Monterey and [supported Macs](https://www.apple.com/macos/monterey/features/#footnote-16).
+Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported Macs](https://www.apple.com/macos/monterey/features/#footnote-16).
 
 ## Download
 
