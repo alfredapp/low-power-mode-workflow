@@ -2,7 +2,11 @@
 
 Toggle Low Power Mode for Battery or Power Adapter
 
-## Instructions
+<a href='https://github.com/alfredapp/low-power-mode-workflow/releases/latest/download/Low.Power.Mode.alfredworkflow'>⤓ Download Workflow</a>
+
+## About
+
+<!-- BEGIN ABOUT -->
 
 Run `lpm` to view the current state of and toggle Low Power Mode for either your battery or power adapter (the choice is remembered).
 
@@ -12,10 +16,6 @@ The External and Hotkey Triggers allow you to set it programatically.
 
 Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported Macs](https://www.apple.com/macos/monterey/features/#footnote-16).
 
-## Download
+<!-- END ABOUT -->
 
-[Get the latest release.](https://github.com/alfredapp/low-power-mode-workflow/releases/latest/download/Low.Power.Mode.alfredworkflow)
-
-## License
-
-3-Clause BSD
+<a href='https://github.com/alfredapp/low-power-mode-workflow/releases/latest/download/Low.Power.Mode.alfredworkflow'>⤓ Download Workflow</a>
