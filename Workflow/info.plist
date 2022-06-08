@@ -116,29 +116,36 @@
 				<key>escaping</key>
 				<integer>68</integer>
 				<key>script</key>
-				<string>function locale() {
-  const app = Application.currentApplication()
-  app.includeStandardAdditions = true
+				<string>ObjC.import("AppKit")
 
-  return app.systemInfo().userLocale.split("_")[0]
+function showPrefPane(pane) {
+  const url = $.NSURL.URLWithString("x-apple.systempreferences:com.apple.preference." + pane)
+  $.NSWorkspace.sharedWorkspace.openURL(url)
+}
+
+function settingsApp() {
+  try { return Application("System Settings") }
+  catch { return Application("System Preferences") }
 }
 
 function run(argv) {
-  const [source, toggle_to] = argv[0].split("|")
+  const source = argv[0]
+  const toggleTo = argv[1]
 
-  const system_preferences = Application("System Preferences")
-  const system_events = Application("System Events")
-  const prefs_running = system_preferences.running()
+  const systemEvents = Application("System Events")
+  const systemSettings = settingsApp()
+  const settingsRunning = systemSettings.running()
 
-  system_preferences.panes.byId("com.apple.preference.battery").anchors.byName(source).reveal()
+  showPrefPane("battery?" + source)
 
   delay(2) // Give the pane time to load
 
   // Checkbox and window name depend on system language
-  const toggle_checkbox = (function() {
-    const windows = system_events.processes.byName("System Preferences").windows
+  const toggleCheckbox = (function() {
+    const language = $.NSLocale.currentLocale.languageCode.js
+    const windows = systemEvents.processes.byName("System Preferences").windows
 
-    switch (locale()) {
+    switch (language) {
       case "en": return windows.byName("Battery").groups[0].checkboxes.byName("Low power mode")
       case "de": return windows.byName("Batterie").groups[0].checkboxes.byName("Stromsparmodus")
       case "es": return windows.byName("Batería").groups[0].checkboxes.byName("Modo de bajo consumo")
@@ -149,9 +156,9 @@ function run(argv) {
     }
   })()
 
-  if (toggle_checkbox.value() === 0 &amp;&amp; toggle_to === "on" || toggle_checkbox.value() === 1 &amp;&amp; toggle_to === "off") toggle_checkbox.click()
+  if (toggleCheckbox.value() === 0 &amp;&amp; toggleTo === "on" || toggleCheckbox.value() === 1 &amp;&amp; toggleTo === "off") toggleCheckbox.click()
 
-  if (!prefs_running) system_preferences.quit()
+  if (!settingsRunning) systemSettings.quit()
 }</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -195,47 +202,55 @@ function run(argv) {
 				<key>runningsubtext</key>
 				<string>Querying Low Power Mode status…</string>
 				<key>script</key>
-				<string>require 'json'
-require 'open3'
+				<string>function runCommand(...arguments) {
+  const task = $.NSTask.alloc.init
+  const stdout = $.NSPipe.pipe
 
-Power = Open3.capture2('/usr/bin/pmset', '-g', 'custom').first
-Battery_match = Power.match(/(Battery) Power:.*?lowpowermode\s*(\d)\n/m)
-Adapter_match = Power.match(/(AC) Power:.*?lowpowermode\s*(\d)\n/m)
+  task.executableURL = $.NSURL.alloc.initFileURLWithPath(arguments[0])
+  task.arguments = arguments.slice(1)
+  task.standardOutput = stdout
+  task.launchAndReturnError(false)
 
-Script_filter_items = [Battery_match, Adapter_match].each_with_object([]) { |source, array|
-  next if source.nil?
+  const dataOut = stdout.fileHandleForReading.readDataToEndOfFile
+  const stringOut = $.NSString.alloc.initWithDataEncoding(dataOut, $.NSUTF8StringEncoding).js
 
-  source_name = source[1]
-  source_arg = case source_name
-               when 'Battery' then 'battery'
-               when 'AC' then 'adapter'
-               else raise ArgumentError, "Invalid value: #{value.inspect}"
-               end
-
-  if source[2].to_i.zero?
-    current_state = 'Off'
-    toggle_state = 'on'
-    icon = "icon_#{source_arg}_off.png"
-  else
-    current_state = 'On'
-    toggle_state = 'off'
-    icon = "icon_#{source_arg}_on.png"
-  end
-
-  array.push(
-    title: "#{source_name}’s Low Power Mode is #{current_state}",
-    subtitle: "Action to turn it #{toggle_state}",
-    arg: "#{source_arg}|#{toggle_state}",
-    icon: { path: icon }
-  )
+  return stringOut
 }
 
-if Script_filter_items.empty?
-  puts({ items: [{ title: 'No power sources found!', valid: false }] }.to_json)
-  exit 1
-end
+const power = runCommand("/usr/bin/pmset", "-g", "custom")
+const batteryMatch = power.match(/(Battery) Power:.*?lowpowermode\s*(\d)\n/s) || undefined
+const adapterMatch = power.match(/(AC) Power:.*?lowpowermode\s*(\d)\n/s) || undefined
 
-puts({ items: Script_filter_items }.to_json)</string>
+const sfItems = [batteryMatch, adapterMatch].map(source =&gt; {
+  if (source === undefined) return undefined
+
+  const sourceName = source[1]
+  const sourceArg = (function() {
+    switch (sourceName) {
+      case "Battery": return "battery"
+      case "AC": return "adapter"
+      default: throw "Invalid source: " + sourceName
+    }
+  })()
+
+  const isOn = source[2] === "1"
+  const currentState = isOn ? "On" : "Off"
+  const toggleState = isOn ? "off" : "on"
+  const icon = isOn ? "icon_" + sourceArg + "_on.png" : "icon_" + sourceArg + "_off.png"
+
+  return {
+    title: sourceName + "’s Low Power Mode is " + currentState,
+    subtitle: "Action to turn it " + toggleState,
+    arg: [sourceArg, toggleState],
+    icon: { path: icon }
+  }
+}).filter(item =&gt; item !== undefined)
+
+if (sfItems.length === 0) {
+  JSON.stringify({ items: [{ title: 'No power sources found!', valid: false }] })
+} else {
+  JSON.stringify({ items: sfItems })
+}</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -245,7 +260,7 @@ puts({ items: Script_filter_items }.to_json)</string>
 				<key>title</key>
 				<string>Toggle Low Power Mode</string>
 				<key>type</key>
-				<integer>2</integer>
+				<integer>7</integer>
 				<key>withspace</key>
 				<true/>
 			</dict>
@@ -577,7 +592,7 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 		</dict>
 	</dict>
 	<key>version</key>
-	<string>2022.1</string>
+	<string>2022.2</string>
 	<key>webaddress</key>
 	<string>https://github.com/alfredapp/low-power-mode-workflow/</string>
 </dict>
