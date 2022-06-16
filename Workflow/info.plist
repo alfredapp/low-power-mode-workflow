@@ -10,7 +10,7 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>3902119C-BADD-48D6-8B69-403FF62B379B</string>
+				<string>C8E64208-3DFA-4BC6-8E15-9A82D9C73DBE</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -71,6 +71,44 @@
 				<false/>
 			</dict>
 		</array>
+		<key>BBF2B1E2-AC6D-45B6-B57D-3C20F246D52B</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3902119C-BADD-48D6-8B69-403FF62B379B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>sourceoutputuid</key>
+				<string>162C4049-4FA3-49CB-8E7E-9DC1B57AF737</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>8906FE3C-6820-470F-A547-CD48DC94CF04</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>C8E64208-3DFA-4BC6-8E15-9A82D9C73DBE</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>BBF2B1E2-AC6D-45B6-B57D-3C20F246D52B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>E81609C2-D3E3-4040-8D9E-CBA2D4435912</key>
 		<array>
 			<dict>
@@ -114,13 +152,39 @@
 				<key>concurrently</key>
 				<false/>
 				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>echo "${alfred_version}" | cut -d. -f1 | tr -d '\n'</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>5</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>C8E64208-3DFA-4BC6-8E15-9A82D9C73DBE</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
 				<integer>68</integer>
 				<key>script</key>
 				<string>ObjC.import("AppKit")
 
-function showPrefPane(pane) {
-  const url = $.NSURL.URLWithString("x-apple.systempreferences:com.apple.preference." + pane)
-  $.NSWorkspace.sharedWorkspace.openURL(url)
+function launchPrefPane(pane) {
+  const url = "x-apple.systempreferences:com.apple.preference." + pane
+  const task = $.NSTask.alloc.init
+  task.executableURL = $.NSURL.alloc.initFileURLWithPath("/usr/bin/open")
+  task.arguments = ["-gj", url]
+  task.launchAndReturnError(false)
 }
 
 function settingsApp() {
@@ -136,7 +200,7 @@ function run(argv) {
   const systemSettings = settingsApp()
   const settingsRunning = systemSettings.running()
 
-  showPrefPane("battery?" + source)
+  launchPrefPane("battery?" + source)
 
   delay(2) // Give the pane time to load
 
@@ -148,8 +212,8 @@ function run(argv) {
     switch (language) {
       case "en": return windows.byName("Battery").groups[0].checkboxes.byName("Low power mode")
       case "de": return windows.byName("Batterie").groups[0].checkboxes.byName("Stromsparmodus")
-      case "es": return windows.byName("Batería").groups[0].checkboxes.byName("Modo de bajo consumo")
-      case "fr": return windows.byName("Batterie").groups[0].checkboxes.byName("Mode économie d’énergie")
+      case "es": return windows.byName("Batería").groups[0].checkboxes.byName("Modo de bajo consumo")
+      case "fr": return windows.byName("Batterie").groups[0].checkboxes.byName("Mode économie d’énergie")
       case "nl": return windows.byName("Batterij").groups[0].checkboxes.byName("Energiebesparingsmodus")
       case "pt": return windows.byName("Bateria").groups[0].checkboxes.byName("Modo de baixo consumo")
       default: return windows[0].groups[0].checkboxes[-1].click()
@@ -236,7 +300,7 @@ const sfItems = [batteryMatch, adapterMatch].map(source =&gt; {
   const isOn = source[2] === "1"
   const currentState = isOn ? "On" : "Off"
   const toggleState = isOn ? "off" : "on"
-  const icon = isOn ? "icon_" + sourceArg + "_on.png" : "icon_" + sourceArg + "_off.png"
+  const icon = isOn ? "images/icon_" + sourceArg + "_on.png" : "images/icon_" + sourceArg + "_off.png"
 
   return {
     title: sourceName + "’s Low Power Mode is " + currentState,
@@ -279,9 +343,13 @@ if (sfItems.length === 0) {
 				<key>escaping</key>
 				<integer>0</integer>
 				<key>script</key>
-				<string># THESE VARIABLES MUST BE SET. SEE THE ONEUPDATER README FOR AN EXPLANATION OF EACH.
-readonly remote_info_plist="https://raw.githubusercontent.com/alfredapp/low-power-mode-workflow/master/Workflow/info.plist"
-readonly workflow_url="alfredapp/low-power-mode-workflow"
+				<string># Special values for OneUpdater reuse
+readonly workflow_webaddress="$(/usr/libexec/PlistBuddy -c 'print webaddress' './info.plist')"
+readonly workflow_repo="$(basename "$(dirname "${workflow_webaddress}")")/$(basename "${workflow_webaddress}")"
+
+# THESE VARIABLES MUST BE SET. SEE THE ONEUPDATER README FOR AN EXPLANATION OF EACH.
+readonly remote_info_plist="${workflow_webaddress}/raw/main/Workflow/info.plist"
+readonly workflow_url="${workflow_repo}"
 readonly download_type='github_release'
 readonly frequency_check='4'
 
@@ -365,6 +433,131 @@ fi</string>
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>conditions</key>
+				<array>
+					<dict>
+						<key>inputstring</key>
+						<string></string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>2</integer>
+						<key>matchstring</key>
+						<string>4</string>
+						<key>outputlabel</key>
+						<string>Update</string>
+						<key>uid</key>
+						<string>162C4049-4FA3-49CB-8E7E-9DC1B57AF737</string>
+					</dict>
+				</array>
+				<key>elselabel</key>
+				<string>Version 4</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.conditional</string>
+			<key>uid</key>
+			<string>BBF2B1E2-AC6D-45B6-B57D-3C20F246D52B</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>0</integer>
+				<key>script</key>
+				<string># Special values for OneUpdater reuse
+readonly workflow_webaddress="$(/usr/libexec/PlistBuddy -c 'print webaddress' './info.plist')"
+readonly workflow_repo_name="$(basename "${workflow_webaddress}" | sed 's/-workflow$//')"
+
+# THESE VARIABLES MUST BE SET. SEE THE ONEUPDATER README FOR AN EXPLANATION OF EACH.
+readonly remote_info_plist="https://github.com/alfredapp/legacy-workflows/raw/main/Workflows/${workflow_repo_name}/info.plist"
+readonly workflow_url="https://github.com/alfredapp/legacy-workflows/raw/main/Workflows/${workflow_repo_name}/${workflow_repo_name}.alfredworkflow"
+readonly download_type='direct'
+readonly frequency_check='4'
+
+# FROM HERE ON, CODE SHOULD BE LEFT UNTOUCHED!
+function abort {
+  echo "${1}" &gt;&amp;2
+  exit 1
+}
+
+function url_exists {
+  curl --silent --location --output /dev/null --fail --range 0-0 "${1}"
+}
+
+function notification {
+  local -r notificator="$(find . -type d -name 'Notificator.app')"
+  if [[ -n "${notificator}" ]]; then
+    "${notificator}/Contents/Resources/Scripts/notificator" --message "${1}" --title "${alfred_workflow_name}" --subtitle 'A new version is available'
+    return
+  fi
+
+  local -r terminal_notifier="$(find . -type f -name 'terminal-notifier')"
+  if [[ -n "${terminal_notifier}" ]]; then
+    "${terminal_notifier}" -title "${alfred_workflow_name}" -subtitle 'A new version is available' -message "${1}"
+    return
+  fi
+
+  osascript -e "display notification \"${1}\" with title \"${alfred_workflow_name}\" subtitle \"A new version is available\""
+}
+
+# Local sanity checks
+readonly local_info_plist='info.plist'
+readonly local_version="$(/usr/libexec/PlistBuddy -c 'print version' "${local_info_plist}")"
+
+[[ -n "${local_version}" ]] || abort 'You need to set a workflow version in the configuration sheet.'
+[[ "${download_type}" =~ ^(direct|page|github_release)$ ]] || abort "'download_type' (${download_type}) needs to be one of 'direct', 'page', or 'github_release'."
+[[ "${frequency_check}" =~ ^[0-9]+$ ]] || abort "'frequency_check' (${frequency_check}) needs to be a number."
+
+# Check for updates
+if [[ $(find "${local_info_plist}" -mtime +"${frequency_check}"d) ]]; then
+  if ! url_exists "${remote_info_plist}"; then abort "'remote_info_plist' (${remote_info_plist}) appears to not be reachable."; fi # Remote sanity check
+
+  readonly tmp_file="$(mktemp)"
+  curl --silent --location --output "${tmp_file}" "${remote_info_plist}"
+  readonly remote_version="$(/usr/libexec/PlistBuddy -c 'print version' "${tmp_file}")"
+
+  if [[ "${local_version}" == "${remote_version}" ]]; then
+    touch "${local_info_plist}" # Reset timer by touching local file
+    exit 0
+  fi
+
+  if [[ "${download_type}" == 'page' ]]; then
+    notification 'Opening download page…'
+    open "${workflow_url}"
+    exit 0
+  fi
+
+  download_url="$([[ "${download_type}" == 'github_release' ]] &amp;&amp; curl --silent "https://api.github.com/repos/${workflow_url}/releases/latest" | grep 'browser_download_url' | head -1 | sed -E 's/.*browser_download_url": "(.*)"/\1/' || echo "${workflow_url}")"
+
+  if url_exists "${download_url}"; then
+    notification 'Downloading and installing…'
+    curl --silent --location --output "${HOME}/Downloads/${alfred_workflow_name}.alfredworkflow" "${download_url}"
+    open "${HOME}/Downloads/${alfred_workflow_name}.alfredworkflow"
+  else
+    abort "'workflow_url' (${download_url}) appears to not be reachable."
+  fi
+fi</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>8906FE3C-6820-470F-A547-CD48DC94CF04</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>action</key>
 				<integer>0</integer>
 				<key>argument</key>
@@ -379,8 +572,6 @@ fi</string>
 				<integer>0</integer>
 				<key>hotmod</key>
 				<integer>0</integer>
-				<key>hotstring</key>
-				<string></string>
 				<key>leftcursor</key>
 				<false/>
 				<key>modsmode</key>
@@ -412,8 +603,6 @@ fi</string>
 				<integer>0</integer>
 				<key>hotmod</key>
 				<integer>0</integer>
-				<key>hotstring</key>
-				<string></string>
 				<key>leftcursor</key>
 				<false/>
 				<key>modsmode</key>
@@ -445,8 +634,6 @@ fi</string>
 				<integer>0</integer>
 				<key>hotmod</key>
 				<integer>0</integer>
-				<key>hotstring</key>
-				<string></string>
 				<key>leftcursor</key>
 				<false/>
 				<key>modsmode</key>
@@ -478,8 +665,6 @@ fi</string>
 				<integer>0</integer>
 				<key>hotmod</key>
 				<integer>0</integer>
-				<key>hotstring</key>
-				<string></string>
 				<key>leftcursor</key>
 				<false/>
 				<key>modsmode</key>
@@ -509,9 +694,9 @@ fi</string>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>Run `lpm` to view the current state of and toggle Low Power Mode for either your battery or power adapter (the choice is remembered).
+	<string>Run `lpm` to view the current state of and toggle Low Power Mode for either your battery or power adapter.
 
-![](https://i.imgur.com/lz0FS2O.png)
+![lpm](images/about/lpm.png)
 
 The External and Hotkey Triggers allow you to set it programatically.
 
@@ -532,7 +717,7 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 			<key>note</key>
 			<string>OneUpdater</string>
 			<key>xpos</key>
-			<integer>460</integer>
+			<integer>730</integer>
 			<key>ypos</key>
 			<integer>40</integer>
 		</dict>
@@ -554,6 +739,17 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 			<key>ypos</key>
 			<integer>330</integer>
 		</dict>
+		<key>8906FE3C-6820-470F-A547-CD48DC94CF04</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>12</integer>
+			<key>note</key>
+			<string>OneUpdater</string>
+			<key>xpos</key>
+			<integer>730</integer>
+			<key>ypos</key>
+			<integer>190</integer>
+		</dict>
 		<key>9AE6437B-6EDF-477E-B93D-36248C0F804B</key>
 		<dict>
 			<key>note</key>
@@ -571,6 +767,26 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 			<integer>55</integer>
 			<key>ypos</key>
 			<integer>610</integer>
+		</dict>
+		<key>BBF2B1E2-AC6D-45B6-B57D-3C20F246D52B</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>5</integer>
+			<key>xpos</key>
+			<integer>590</integer>
+			<key>ypos</key>
+			<integer>60</integer>
+		</dict>
+		<key>C8E64208-3DFA-4BC6-8E15-9A82D9C73DBE</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>5</integer>
+			<key>note</key>
+			<string>Major Alfred version</string>
+			<key>xpos</key>
+			<integer>430</integer>
+			<key>ypos</key>
+			<integer>40</integer>
 		</dict>
 		<key>E81609C2-D3E3-4040-8D9E-CBA2D4435912</key>
 		<dict>
@@ -591,8 +807,10 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 			<integer>470</integer>
 		</dict>
 	</dict>
+	<key>variablesdontexport</key>
+	<array/>
 	<key>version</key>
-	<string>2022.2</string>
+	<string>2022.3</string>
 	<key>webaddress</key>
 	<string>https://github.com/alfredapp/low-power-mode-workflow/</string>
 </dict>
