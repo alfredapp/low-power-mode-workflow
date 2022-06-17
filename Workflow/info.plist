@@ -696,7 +696,7 @@ fi</string>
 	<key>readme</key>
 	<string>Run `lpm` to view the current state of and toggle Low Power Mode for either your battery or power adapter.
 
-![lpm](images/about/lpm.png)
+![Alfred results for lpm](images/about/lpm.png)
 
 The External and Hotkey Triggers allow you to set it programatically.
 
@@ -807,8 +807,6 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 			<integer>470</integer>
 		</dict>
 	</dict>
-	<key>variablesdontexport</key>
-	<array/>
 	<key>version</key>
 	<string>2022.3</string>
 	<key>webaddress</key>
