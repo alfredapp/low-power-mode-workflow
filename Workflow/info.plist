@@ -10,7 +10,7 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>C8E64208-3DFA-4BC6-8E15-9A82D9C73DBE</string>
+				<string>3902119C-BADD-48D6-8B69-403FF62B379B</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -71,44 +71,6 @@
 				<false/>
 			</dict>
 		</array>
-		<key>BBF2B1E2-AC6D-45B6-B57D-3C20F246D52B</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>3902119C-BADD-48D6-8B69-403FF62B379B</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>sourceoutputuid</key>
-				<string>162C4049-4FA3-49CB-8E7E-9DC1B57AF737</string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>8906FE3C-6820-470F-A547-CD48DC94CF04</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>C8E64208-3DFA-4BC6-8E15-9A82D9C73DBE</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>BBF2B1E2-AC6D-45B6-B57D-3C20F246D52B</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
 		<key>E81609C2-D3E3-4040-8D9E-CBA2D4435912</key>
 		<array>
 			<dict>
@@ -146,29 +108,6 @@
 	<string>Low Power Mode</string>
 	<key>objects</key>
 	<array>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>script</key>
-				<string>echo "${alfred_version}" | cut -d. -f1 | tr -d '\n'</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>type</key>
-				<integer>5</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>C8E64208-3DFA-4BC6-8E15-9A82D9C73DBE</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -433,131 +372,6 @@ fi</string>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>conditions</key>
-				<array>
-					<dict>
-						<key>inputstring</key>
-						<string></string>
-						<key>matchcasesensitive</key>
-						<false/>
-						<key>matchmode</key>
-						<integer>2</integer>
-						<key>matchstring</key>
-						<string>4</string>
-						<key>outputlabel</key>
-						<string>Update</string>
-						<key>uid</key>
-						<string>162C4049-4FA3-49CB-8E7E-9DC1B57AF737</string>
-					</dict>
-				</array>
-				<key>elselabel</key>
-				<string>Version 4</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.utility.conditional</string>
-			<key>uid</key>
-			<string>BBF2B1E2-AC6D-45B6-B57D-3C20F246D52B</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>0</integer>
-				<key>script</key>
-				<string># Special values for OneUpdater reuse
-readonly workflow_webaddress="$(/usr/libexec/PlistBuddy -c 'print webaddress' './info.plist')"
-readonly workflow_repo_name="$(basename "${workflow_webaddress}" | sed 's/-workflow$//')"
-
-# THESE VARIABLES MUST BE SET. SEE THE ONEUPDATER README FOR AN EXPLANATION OF EACH.
-readonly remote_info_plist="https://github.com/alfredapp/legacy-workflows/raw/main/Workflows/${workflow_repo_name}/info.plist"
-readonly workflow_url="https://github.com/alfredapp/legacy-workflows/raw/main/Workflows/${workflow_repo_name}/${workflow_repo_name}.alfredworkflow"
-readonly download_type='direct'
-readonly frequency_check='4'
-
-# FROM HERE ON, CODE SHOULD BE LEFT UNTOUCHED!
-function abort {
-  echo "${1}" &gt;&amp;2
-  exit 1
-}
-
-function url_exists {
-  curl --silent --location --output /dev/null --fail --range 0-0 "${1}"
-}
-
-function notification {
-  local -r notificator="$(find . -type d -name 'Notificator.app')"
-  if [[ -n "${notificator}" ]]; then
-    "${notificator}/Contents/Resources/Scripts/notificator" --message "${1}" --title "${alfred_workflow_name}" --subtitle 'A new version is available'
-    return
-  fi
-
-  local -r terminal_notifier="$(find . -type f -name 'terminal-notifier')"
-  if [[ -n "${terminal_notifier}" ]]; then
-    "${terminal_notifier}" -title "${alfred_workflow_name}" -subtitle 'A new version is available' -message "${1}"
-    return
-  fi
-
-  osascript -e "display notification \"${1}\" with title \"${alfred_workflow_name}\" subtitle \"A new version is available\""
-}
-
-# Local sanity checks
-readonly local_info_plist='info.plist'
-readonly local_version="$(/usr/libexec/PlistBuddy -c 'print version' "${local_info_plist}")"
-
-[[ -n "${local_version}" ]] || abort 'You need to set a workflow version in the configuration sheet.'
-[[ "${download_type}" =~ ^(direct|page|github_release)$ ]] || abort "'download_type' (${download_type}) needs to be one of 'direct', 'page', or 'github_release'."
-[[ "${frequency_check}" =~ ^[0-9]+$ ]] || abort "'frequency_check' (${frequency_check}) needs to be a number."
-
-# Check for updates
-if [[ $(find "${local_info_plist}" -mtime +"${frequency_check}"d) ]]; then
-  if ! url_exists "${remote_info_plist}"; then abort "'remote_info_plist' (${remote_info_plist}) appears to not be reachable."; fi # Remote sanity check
-
-  readonly tmp_file="$(mktemp)"
-  curl --silent --location --output "${tmp_file}" "${remote_info_plist}"
-  readonly remote_version="$(/usr/libexec/PlistBuddy -c 'print version' "${tmp_file}")"
-
-  if [[ "${local_version}" == "${remote_version}" ]]; then
-    touch "${local_info_plist}" # Reset timer by touching local file
-    exit 0
-  fi
-
-  if [[ "${download_type}" == 'page' ]]; then
-    notification 'Opening download page…'
-    open "${workflow_url}"
-    exit 0
-  fi
-
-  download_url="$([[ "${download_type}" == 'github_release' ]] &amp;&amp; curl --silent "https://api.github.com/repos/${workflow_url}/releases/latest" | grep 'browser_download_url' | head -1 | sed -E 's/.*browser_download_url": "(.*)"/\1/' || echo "${workflow_url}")"
-
-  if url_exists "${download_url}"; then
-    notification 'Downloading and installing…'
-    curl --silent --location --output "${HOME}/Downloads/${alfred_workflow_name}.alfredworkflow" "${download_url}"
-    open "${HOME}/Downloads/${alfred_workflow_name}.alfredworkflow"
-  else
-    abort "'workflow_url' (${download_url}) appears to not be reachable."
-  fi
-fi</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>8906FE3C-6820-470F-A547-CD48DC94CF04</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>action</key>
 				<integer>0</integer>
 				<key>argument</key>
@@ -682,6 +496,8 @@ fi</string>
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>availableviaurlhandler</key>
+				<false/>
 				<key>triggerid</key>
 				<string>toggle</string>
 			</dict>
@@ -706,9 +522,9 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 		<key>09F16EEE-6DBF-4559-87E0-EBCF59F92293</key>
 		<dict>
 			<key>xpos</key>
-			<integer>260</integer>
+			<real>260</real>
 			<key>ypos</key>
-			<integer>40</integer>
+			<real>40</real>
 		</dict>
 		<key>3902119C-BADD-48D6-8B69-403FF62B379B</key>
 		<dict>
@@ -717,98 +533,71 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 			<key>note</key>
 			<string>OneUpdater</string>
 			<key>xpos</key>
-			<integer>730</integer>
+			<real>430</real>
 			<key>ypos</key>
-			<integer>40</integer>
+			<real>40</real>
 		</dict>
 		<key>5F671FDE-E06C-42F6-A4A0-EB735D77DDB3</key>
 		<dict>
 			<key>note</key>
 			<string>Interactive toggle</string>
 			<key>xpos</key>
-			<integer>55</integer>
+			<real>55</real>
 			<key>ypos</key>
-			<integer>40</integer>
+			<real>40</real>
 		</dict>
 		<key>6D410135-FACB-46E9-BFF1-DDDF2EB93B1E</key>
 		<dict>
 			<key>note</key>
 			<string>Off for Battery</string>
 			<key>xpos</key>
-			<integer>55</integer>
+			<real>55</real>
 			<key>ypos</key>
-			<integer>330</integer>
-		</dict>
-		<key>8906FE3C-6820-470F-A547-CD48DC94CF04</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>12</integer>
-			<key>note</key>
-			<string>OneUpdater</string>
-			<key>xpos</key>
-			<integer>730</integer>
-			<key>ypos</key>
-			<integer>190</integer>
+			<real>330</real>
 		</dict>
 		<key>9AE6437B-6EDF-477E-B93D-36248C0F804B</key>
 		<dict>
 			<key>note</key>
 			<string>On for Battery</string>
 			<key>xpos</key>
-			<integer>55</integer>
+			<real>55</real>
 			<key>ypos</key>
-			<integer>190</integer>
+			<real>190</real>
 		</dict>
 		<key>B23EAB9A-DD81-4931-9F5D-CF369CEBDB3D</key>
 		<dict>
 			<key>note</key>
 			<string>Off for AC Adapter</string>
 			<key>xpos</key>
-			<integer>55</integer>
+			<real>55</real>
 			<key>ypos</key>
-			<integer>610</integer>
-		</dict>
-		<key>BBF2B1E2-AC6D-45B6-B57D-3C20F246D52B</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>5</integer>
-			<key>xpos</key>
-			<integer>590</integer>
-			<key>ypos</key>
-			<integer>60</integer>
-		</dict>
-		<key>C8E64208-3DFA-4BC6-8E15-9A82D9C73DBE</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>5</integer>
-			<key>note</key>
-			<string>Major Alfred version</string>
-			<key>xpos</key>
-			<integer>430</integer>
-			<key>ypos</key>
-			<integer>40</integer>
+			<real>610</real>
 		</dict>
 		<key>E81609C2-D3E3-4040-8D9E-CBA2D4435912</key>
 		<dict>
 			<key>note</key>
 			<string>For valid arguments, see the Hotkey Triggers</string>
 			<key>xpos</key>
-			<integer>55</integer>
+			<real>55</real>
 			<key>ypos</key>
-			<integer>760</integer>
+			<real>760</real>
 		</dict>
 		<key>F2F45E2B-849C-4612-BBEC-8814845257D0</key>
 		<dict>
 			<key>note</key>
 			<string>On for AC Adapter</string>
 			<key>xpos</key>
-			<integer>55</integer>
+			<real>55</real>
 			<key>ypos</key>
-			<integer>470</integer>
+			<real>470</real>
 		</dict>
 	</dict>
+	<key>userconfigurationconfig</key>
+	<array/>
+	<key>variablesdontexport</key>
+	<array/>
 	<key>version</key>
-	<string>2022.3</string>
+	<string>2022.4</string>
 	<key>webaddress</key>
 	<string>https://github.com/alfredapp/low-power-mode-workflow/</string>
 </dict>
