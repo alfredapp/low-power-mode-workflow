@@ -10,7 +10,20 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>3902119C-BADD-48D6-8B69-403FF62B379B</string>
+				<string>5C73589E-A064-4326-84BA-8F9692C354A7</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>5C73589E-A064-4326-84BA-8F9692C354A7</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>60CC7FF3-E5C3-475F-92B3-A99EE4A8612C</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -24,6 +37,19 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>09F16EEE-6DBF-4559-87E0-EBCF59F92293</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>60CC7FF3-E5C3-475F-92B3-A99EE4A8612C</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3902119C-BADD-48D6-8B69-403FF62B379B</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -372,6 +398,61 @@ fi</string>
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>sw_vers -productVersion | cut -d. -f1 | tr -d '\n'</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>5</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>5C73589E-A064-4326-84BA-8F9692C354A7</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>conditions</key>
+				<array>
+					<dict>
+						<key>inputstring</key>
+						<string></string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>3</integer>
+						<key>matchstring</key>
+						<string>13</string>
+						<key>outputlabel</key>
+						<string>Monterey or Below</string>
+						<key>uid</key>
+						<string>162C4049-4FA3-49CB-8E7E-9DC1B57AF737</string>
+					</dict>
+				</array>
+				<key>elselabel</key>
+				<string>Ventura or Above</string>
+				<key>hideelse</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.conditional</string>
+			<key>uid</key>
+			<string>60CC7FF3-E5C3-475F-92B3-A99EE4A8612C</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>action</key>
 				<integer>0</integer>
 				<key>argument</key>
@@ -533,6 +614,17 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 			<key>note</key>
 			<string>OneUpdater</string>
 			<key>xpos</key>
+			<real>750</real>
+			<key>ypos</key>
+			<real>40</real>
+		</dict>
+		<key>5C73589E-A064-4326-84BA-8F9692C354A7</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>5</integer>
+			<key>note</key>
+			<string>Major macOS version</string>
+			<key>xpos</key>
 			<real>430</real>
 			<key>ypos</key>
 			<real>40</real>
@@ -545,6 +637,17 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 			<real>55</real>
 			<key>ypos</key>
 			<real>40</real>
+		</dict>
+		<key>60CC7FF3-E5C3-475F-92B3-A99EE4A8612C</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>5</integer>
+			<key>note</key>
+			<string>Only update on Ventura, due to new System Settings app</string>
+			<key>xpos</key>
+			<real>590</real>
+			<key>ypos</key>
+			<real>60</real>
 		</dict>
 		<key>6D410135-FACB-46E9-BFF1-DDDF2EB93B1E</key>
 		<dict>
@@ -597,7 +700,7 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>2022.4</string>
+	<string>2022.5</string>
 	<key>webaddress</key>
 	<string>https://github.com/alfredapp/low-power-mode-workflow/</string>
 </dict>
