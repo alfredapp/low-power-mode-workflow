@@ -219,7 +219,7 @@ function run(argv) {
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
-				<string>lpm</string>
+				<string>{var:status_keyword}</string>
 				<key>queuedelaycustom</key>
 				<integer>3</integer>
 				<key>queuedelayimmediatelyinitially</key>
@@ -299,6 +299,29 @@ if (sfItems.length === 0) {
 			<string>5F671FDE-E06C-42F6-A4A0-EB735D77DDB3</string>
 			<key>version</key>
 			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>sw_vers -productVersion | cut -d. -f1 | tr -d '\n'</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>5</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>5C73589E-A064-4326-84BA-8F9692C354A7</string>
+			<key>version</key>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -392,29 +415,6 @@ fi</string>
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
 			<string>3902119C-BADD-48D6-8B69-403FF62B379B</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>script</key>
-				<string>sw_vers -productVersion | cut -d. -f1 | tr -d '\n'</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>type</key>
-				<integer>5</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>5C73589E-A064-4326-84BA-8F9692C354A7</string>
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
@@ -591,13 +591,13 @@ fi</string>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>Run `lpm` to view the current state of and toggle Low Power Mode for either your battery or power adapter.
+	<string>## Usage
+
+Run the Status Keyword (default: `lpm`) to view the current state of and toggle Low Power Mode for either your battery or power adapter.
 
 ![Alfred results for lpm](images/about/lpm.png)
 
-The External and Hotkey Triggers allow you to set it programatically.
-
-Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported Macs](https://www.apple.com/macos/monterey/features/#footnote-16).</string>
+Configure the [Hotkey Triggers](https://www.alfredapp.com/help/workflows/triggers/hotkey/) for faster toggling.</string>
 	<key>uidata</key>
 	<dict>
 		<key>09F16EEE-6DBF-4559-87E0-EBCF59F92293</key>
@@ -696,11 +696,31 @@ Lower Power Mode is a macOS feature introduced in macOS Monterey and [supported 
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
-	<array/>
-	<key>variablesdontexport</key>
-	<array/>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>lpm</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Status Keyword</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>status_keyword</string>
+		</dict>
+	</array>
 	<key>version</key>
-	<string>2022.5</string>
+	<string>2022.6</string>
 	<key>webaddress</key>
 	<string>https://github.com/alfredapp/low-power-mode-workflow/</string>
 </dict>
