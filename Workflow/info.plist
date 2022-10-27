@@ -10,45 +10,6 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>5C73589E-A064-4326-84BA-8F9692C354A7</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>5C73589E-A064-4326-84BA-8F9692C354A7</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>60CC7FF3-E5C3-475F-92B3-A99EE4A8612C</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>5F671FDE-E06C-42F6-A4A0-EB735D77DDB3</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>09F16EEE-6DBF-4559-87E0-EBCF59F92293</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>60CC7FF3-E5C3-475F-92B3-A99EE4A8612C</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
 				<string>3902119C-BADD-48D6-8B69-403FF62B379B</string>
 				<key>modifiers</key>
 				<integer>0</integer>
@@ -58,59 +19,7 @@
 				<false/>
 			</dict>
 		</array>
-		<key>6D410135-FACB-46E9-BFF1-DDDF2EB93B1E</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>09F16EEE-6DBF-4559-87E0-EBCF59F92293</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>9AE6437B-6EDF-477E-B93D-36248C0F804B</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>09F16EEE-6DBF-4559-87E0-EBCF59F92293</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>B23EAB9A-DD81-4931-9F5D-CF369CEBDB3D</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>09F16EEE-6DBF-4559-87E0-EBCF59F92293</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>E81609C2-D3E3-4040-8D9E-CBA2D4435912</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>09F16EEE-6DBF-4559-87E0-EBCF59F92293</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>F2F45E2B-849C-4612-BBEC-8814845257D0</key>
+		<key>5F671FDE-E06C-42F6-A4A0-EB735D77DDB3</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
@@ -144,7 +53,7 @@
 				<key>script</key>
 				<string>ObjC.import("AppKit")
 
-function launchPrefPane(pane) {
+function launchSettingsPaneInBackground(pane) {
   const url = "x-apple.systempreferences:com.apple.preference." + pane
   const task = $.NSTask.alloc.init
   task.executableURL = $.NSURL.alloc.initFileURLWithPath("/usr/bin/open")
@@ -152,40 +61,29 @@ function launchPrefPane(pane) {
   task.launchAndReturnError(false)
 }
 
-function settingsApp() {
-  try { return Application("System Settings") }
-  catch { return Application("System Preferences") }
-}
-
 function run(argv) {
-  const source = argv[0]
-  const toggleTo = argv[1]
-
-  const systemEvents = Application("System Events")
-  const systemSettings = settingsApp()
+  const lpmOptionIndex = argv[0]
+  const systemSettings = Application("System Settings")
   const settingsRunning = systemSettings.running()
 
-  launchPrefPane("battery?" + source)
+  launchSettingsPaneInBackground("battery")
+  delay(1) // Give the pane time to load
 
-  delay(2) // Give the pane time to load
+  const popoverButton = Application("System Events")
+    .applicationProcesses
+    .byName("System Settings")
+    .windows[0]
+    .groups[0]
+    .splitterGroups[0]
+    .groups[1]
+    .groups[0]
+    .scrollAreas[0]
+    .groups[0]
+    .popUpButtons[0]
 
-  // Checkbox and window name depend on system language
-  const toggleCheckbox = (function() {
-    const language = $.NSLocale.currentLocale.languageCode.js
-    const windows = systemEvents.processes.byName("System Preferences").windows
-
-    switch (language) {
-      case "en": return windows.byName("Battery").groups[0].checkboxes.byName("Low power mode")
-      case "de": return windows.byName("Batterie").groups[0].checkboxes.byName("Stromsparmodus")
-      case "es": return windows.byName("Batería").groups[0].checkboxes.byName("Modo de bajo consumo")
-      case "fr": return windows.byName("Batterie").groups[0].checkboxes.byName("Mode économie d’énergie")
-      case "nl": return windows.byName("Batterij").groups[0].checkboxes.byName("Energiebesparingsmodus")
-      case "pt": return windows.byName("Bateria").groups[0].checkboxes.byName("Modo de baixo consumo")
-      default: return windows[0].groups[0].checkboxes[-1].click()
-    }
-  })()
-
-  if (toggleCheckbox.value() === 0 &amp;&amp; toggleTo === "on" || toggleCheckbox.value() === 1 &amp;&amp; toggleTo === "off") toggleCheckbox.click()
+  popoverButton.click()
+  delay(0.5) // Give the popover time to open
+  popoverButton.menus[0].menuItems[lpmOptionIndex].click()
 
   if (!settingsRunning) systemSettings.quit()
 }</string>
@@ -200,126 +98,6 @@ function run(argv) {
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
 			<string>09F16EEE-6DBF-4559-87E0-EBCF59F92293</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>alfredfiltersresults</key>
-				<true/>
-				<key>alfredfiltersresultsmatchmode</key>
-				<integer>0</integer>
-				<key>argumenttreatemptyqueryasnil</key>
-				<true/>
-				<key>argumenttrimmode</key>
-				<integer>0</integer>
-				<key>argumenttype</key>
-				<integer>1</integer>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>keyword</key>
-				<string>{var:status_keyword}</string>
-				<key>queuedelaycustom</key>
-				<integer>3</integer>
-				<key>queuedelayimmediatelyinitially</key>
-				<true/>
-				<key>queuedelaymode</key>
-				<integer>0</integer>
-				<key>queuemode</key>
-				<integer>1</integer>
-				<key>runningsubtext</key>
-				<string>Querying Low Power Mode status…</string>
-				<key>script</key>
-				<string>function runCommand(...arguments) {
-  const task = $.NSTask.alloc.init
-  const stdout = $.NSPipe.pipe
-
-  task.executableURL = $.NSURL.alloc.initFileURLWithPath(arguments[0])
-  task.arguments = arguments.slice(1)
-  task.standardOutput = stdout
-  task.launchAndReturnError(false)
-
-  const dataOut = stdout.fileHandleForReading.readDataToEndOfFile
-  const stringOut = $.NSString.alloc.initWithDataEncoding(dataOut, $.NSUTF8StringEncoding).js
-
-  return stringOut
-}
-
-const power = runCommand("/usr/bin/pmset", "-g", "custom")
-const batteryMatch = power.match(/(Battery) Power:.*?lowpowermode\s*(\d)\n/s) || undefined
-const adapterMatch = power.match(/(AC) Power:.*?lowpowermode\s*(\d)\n/s) || undefined
-
-const sfItems = [batteryMatch, adapterMatch].map(source =&gt; {
-  if (source === undefined) return undefined
-
-  const sourceName = source[1]
-  const sourceArg = (function() {
-    switch (sourceName) {
-      case "Battery": return "battery"
-      case "AC": return "adapter"
-      default: throw "Invalid source: " + sourceName
-    }
-  })()
-
-  const isOn = source[2] === "1"
-  const currentState = isOn ? "On" : "Off"
-  const toggleState = isOn ? "off" : "on"
-  const icon = isOn ? "images/icon_" + sourceArg + "_on.png" : "images/icon_" + sourceArg + "_off.png"
-
-  return {
-    title: sourceName + "’s Low Power Mode is " + currentState,
-    subtitle: "Action to turn it " + toggleState,
-    arg: [sourceArg, toggleState],
-    icon: { path: icon }
-  }
-}).filter(item =&gt; item !== undefined)
-
-if (sfItems.length === 0) {
-  JSON.stringify({ items: [{ title: 'No power sources found!', valid: false }] })
-} else {
-  JSON.stringify({ items: sfItems })
-}</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>subtext</key>
-				<string></string>
-				<key>title</key>
-				<string>Toggle Low Power Mode</string>
-				<key>type</key>
-				<integer>7</integer>
-				<key>withspace</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
-			<key>uid</key>
-			<string>5F671FDE-E06C-42F6-A4A0-EB735D77DDB3</string>
-			<key>version</key>
-			<integer>3</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>script</key>
-				<string>sw_vers -productVersion | cut -d. -f1 | tr -d '\n'</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>type</key>
-				<integer>5</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>5C73589E-A064-4326-84BA-8F9692C354A7</string>
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
@@ -421,173 +199,99 @@ fi</string>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>conditions</key>
-				<array>
-					<dict>
-						<key>inputstring</key>
-						<string></string>
-						<key>matchcasesensitive</key>
-						<false/>
-						<key>matchmode</key>
-						<integer>3</integer>
-						<key>matchstring</key>
-						<string>13</string>
-						<key>outputlabel</key>
-						<string>Monterey or Below</string>
-						<key>uid</key>
-						<string>162C4049-4FA3-49CB-8E7E-9DC1B57AF737</string>
-					</dict>
-				</array>
-				<key>elselabel</key>
-				<string>Ventura or Above</string>
-				<key>hideelse</key>
-				<false/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.utility.conditional</string>
-			<key>uid</key>
-			<string>60CC7FF3-E5C3-475F-92B3-A99EE4A8612C</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>action</key>
+				<key>alfredfiltersresults</key>
+				<true/>
+				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
-				<key>argument</key>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:status_keyword}</string>
+				<key>queuedelaycustom</key>
 				<integer>3</integer>
-				<key>argumenttext</key>
-				<string>battery|on</string>
-				<key>focusedappvariable</key>
-				<false/>
-				<key>focusedappvariablename</key>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Querying Low Power Mode status…</string>
+				<key>script</key>
+				<string>function runCommand(...arguments) {
+  const task = $.NSTask.alloc.init
+  const stdout = $.NSPipe.pipe
+
+  task.executableURL = $.NSURL.alloc.initFileURLWithPath(arguments[0])
+  task.arguments = arguments.slice(1)
+  task.standardOutput = stdout
+  task.launchAndReturnError(false)
+
+  const dataOut = stdout.fileHandleForReading.readDataToEndOfFile
+  const stringOut = $.NSString.alloc.initWithDataEncoding(dataOut, $.NSUTF8StringEncoding).js
+
+  return stringOut
+}
+
+function lpmOptionIndex(batteryLowPowerOn, adapterLowPowerOn) {
+  if (!batteryLowPowerOn &amp;&amp; !adapterLowPowerOn) { return 0 } // Never
+  else if (batteryLowPowerOn &amp;&amp; adapterLowPowerOn) { return 1 } // Always
+  else if (batteryLowPowerOn &amp;&amp; !adapterLowPowerOn) { return 2 } // Only on Battery
+  else { return 3 } // Only on Power Adapter
+}
+
+const power = runCommand("/usr/bin/pmset", "-g", "custom")
+const batteryMatch = power.match(/(Battery) Power:.*?lowpowermode\s*(\d)\n/s)
+const adapterMatch = power.match(/(AC) Power:.*?lowpowermode\s*(\d)\n/s)
+const batteryName = batteryMatch[1]
+const adapterName = adapterMatch[1]
+const batteryLowPowerOn = batteryMatch[2] === "1"
+const adapterLowPowerOn = adapterMatch[2] === "1"
+const batteryLowPowerState = batteryLowPowerOn ? "On" : "Off"
+const adapterLowPowerState = adapterLowPowerOn ? "On" : "Off"
+const batteryIcon = batteryLowPowerOn ? "images/icon_battery_on.png" : "images/icon_battery_off.png"
+const adapterIcon = adapterLowPowerOn ? "images/icon_adapter_on.png" : "images/icon_adapter_off.png"
+
+const batteryItem = {
+  title: batteryName + "’s Low Power Mode is " + batteryLowPowerState,
+  subtitle: "Action to turn it " + batteryLowPowerState.toLowerCase(),
+  arg: lpmOptionIndex(!batteryLowPowerOn, adapterLowPowerOn),
+  icon: { path: batteryIcon }
+}
+
+const adapterItem = {
+  title: adapterName + "’s Low Power Mode is " + adapterLowPowerState,
+  subtitle: "Action to turn it " + adapterLowPowerState.toLowerCase(),
+  arg: lpmOptionIndex(batteryLowPowerOn, !adapterLowPowerOn),
+  icon: { path: adapterIcon }
+}
+
+JSON.stringify({ items: [batteryItem, adapterItem] })</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
 				<string></string>
-				<key>hotkey</key>
-				<integer>0</integer>
-				<key>hotmod</key>
-				<integer>0</integer>
-				<key>leftcursor</key>
-				<false/>
-				<key>modsmode</key>
-				<integer>0</integer>
-				<key>relatedAppsMode</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.trigger.hotkey</string>
-			<key>uid</key>
-			<string>9AE6437B-6EDF-477E-B93D-36248C0F804B</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>action</key>
-				<integer>0</integer>
-				<key>argument</key>
-				<integer>3</integer>
-				<key>argumenttext</key>
-				<string>battery|off</string>
-				<key>focusedappvariable</key>
-				<false/>
-				<key>focusedappvariablename</key>
+				<key>subtext</key>
 				<string></string>
-				<key>hotkey</key>
-				<integer>0</integer>
-				<key>hotmod</key>
-				<integer>0</integer>
-				<key>leftcursor</key>
-				<false/>
-				<key>modsmode</key>
-				<integer>0</integer>
-				<key>relatedAppsMode</key>
-				<integer>0</integer>
+				<key>title</key>
+				<string>Toggle Low Power Mode</string>
+				<key>type</key>
+				<integer>7</integer>
+				<key>withspace</key>
+				<true/>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.trigger.hotkey</string>
+			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
-			<string>6D410135-FACB-46E9-BFF1-DDDF2EB93B1E</string>
+			<string>5F671FDE-E06C-42F6-A4A0-EB735D77DDB3</string>
 			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>action</key>
-				<integer>0</integer>
-				<key>argument</key>
-				<integer>3</integer>
-				<key>argumenttext</key>
-				<string>adapter|on</string>
-				<key>focusedappvariable</key>
-				<false/>
-				<key>focusedappvariablename</key>
-				<string></string>
-				<key>hotkey</key>
-				<integer>0</integer>
-				<key>hotmod</key>
-				<integer>0</integer>
-				<key>leftcursor</key>
-				<false/>
-				<key>modsmode</key>
-				<integer>0</integer>
-				<key>relatedAppsMode</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.trigger.hotkey</string>
-			<key>uid</key>
-			<string>F2F45E2B-849C-4612-BBEC-8814845257D0</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>action</key>
-				<integer>0</integer>
-				<key>argument</key>
-				<integer>3</integer>
-				<key>argumenttext</key>
-				<string>adapter|off</string>
-				<key>focusedappvariable</key>
-				<false/>
-				<key>focusedappvariablename</key>
-				<string></string>
-				<key>hotkey</key>
-				<integer>0</integer>
-				<key>hotmod</key>
-				<integer>0</integer>
-				<key>leftcursor</key>
-				<false/>
-				<key>modsmode</key>
-				<integer>0</integer>
-				<key>relatedAppsMode</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.trigger.hotkey</string>
-			<key>uid</key>
-			<string>B23EAB9A-DD81-4931-9F5D-CF369CEBDB3D</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>availableviaurlhandler</key>
-				<false/>
-				<key>triggerid</key>
-				<string>toggle</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.trigger.external</string>
-			<key>uid</key>
-			<string>E81609C2-D3E3-4040-8D9E-CBA2D4435912</string>
-			<key>version</key>
-			<integer>1</integer>
+			<integer>3</integer>
 		</dict>
 	</array>
 	<key>readme</key>
@@ -595,15 +299,13 @@ fi</string>
 
 Run the Status Keyword (default: `lpm`) to view the current state of and toggle Low Power Mode for either your battery or power adapter.
 
-![Alfred results for lpm](images/about/lpm.png)
-
-Configure the [Hotkey Triggers](https://www.alfredapp.com/help/workflows/triggers/hotkey/) for faster toggling.</string>
+![Alfred results for lpm](images/about/lpm.png)</string>
 	<key>uidata</key>
 	<dict>
 		<key>09F16EEE-6DBF-4559-87E0-EBCF59F92293</key>
 		<dict>
 			<key>xpos</key>
-			<real>260</real>
+			<real>250</real>
 			<key>ypos</key>
 			<real>40</real>
 		</dict>
@@ -614,17 +316,6 @@ Configure the [Hotkey Triggers](https://www.alfredapp.com/help/workflows/trigger
 			<key>note</key>
 			<string>OneUpdater</string>
 			<key>xpos</key>
-			<real>750</real>
-			<key>ypos</key>
-			<real>40</real>
-		</dict>
-		<key>5C73589E-A064-4326-84BA-8F9692C354A7</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>5</integer>
-			<key>note</key>
-			<string>Major macOS version</string>
-			<key>xpos</key>
 			<real>430</real>
 			<key>ypos</key>
 			<real>40</real>
@@ -634,65 +325,9 @@ Configure the [Hotkey Triggers](https://www.alfredapp.com/help/workflows/trigger
 			<key>note</key>
 			<string>Interactive toggle</string>
 			<key>xpos</key>
-			<real>55</real>
+			<real>45</real>
 			<key>ypos</key>
 			<real>40</real>
-		</dict>
-		<key>60CC7FF3-E5C3-475F-92B3-A99EE4A8612C</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>5</integer>
-			<key>note</key>
-			<string>Only update on Ventura, due to new System Settings app</string>
-			<key>xpos</key>
-			<real>590</real>
-			<key>ypos</key>
-			<real>60</real>
-		</dict>
-		<key>6D410135-FACB-46E9-BFF1-DDDF2EB93B1E</key>
-		<dict>
-			<key>note</key>
-			<string>Off for Battery</string>
-			<key>xpos</key>
-			<real>55</real>
-			<key>ypos</key>
-			<real>330</real>
-		</dict>
-		<key>9AE6437B-6EDF-477E-B93D-36248C0F804B</key>
-		<dict>
-			<key>note</key>
-			<string>On for Battery</string>
-			<key>xpos</key>
-			<real>55</real>
-			<key>ypos</key>
-			<real>190</real>
-		</dict>
-		<key>B23EAB9A-DD81-4931-9F5D-CF369CEBDB3D</key>
-		<dict>
-			<key>note</key>
-			<string>Off for AC Adapter</string>
-			<key>xpos</key>
-			<real>55</real>
-			<key>ypos</key>
-			<real>610</real>
-		</dict>
-		<key>E81609C2-D3E3-4040-8D9E-CBA2D4435912</key>
-		<dict>
-			<key>note</key>
-			<string>For valid arguments, see the Hotkey Triggers</string>
-			<key>xpos</key>
-			<real>55</real>
-			<key>ypos</key>
-			<real>760</real>
-		</dict>
-		<key>F2F45E2B-849C-4612-BBEC-8814845257D0</key>
-		<dict>
-			<key>note</key>
-			<string>On for AC Adapter</string>
-			<key>xpos</key>
-			<real>55</real>
-			<key>ypos</key>
-			<real>470</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
@@ -720,7 +355,7 @@ Configure the [Hotkey Triggers](https://www.alfredapp.com/help/workflows/trigger
 		</dict>
 	</array>
 	<key>version</key>
-	<string>2022.6</string>
+	<string>2022.7</string>
 	<key>webaddress</key>
 	<string>https://github.com/alfredapp/low-power-mode-workflow/</string>
 </dict>
