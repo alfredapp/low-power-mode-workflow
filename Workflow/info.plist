@@ -42,12 +42,9 @@
 				<key>script</key>
 				<string>ObjC.import("AppKit")
 
-function launchSettingsPaneInBackground(pane) {
-  const url = "x-apple.systempreferences:" + pane
-  const task = $.NSTask.alloc.init
-  task.executableURL = $.NSURL.alloc.initFileURLWithPath("/usr/bin/open")
-  task.arguments = ["-gj", url]
-  task.launchAndReturnError(false)
+function launchSettingsPane(pane) {
+  const url = $.NSURL.URLWithString("x-apple.systempreferences:" + pane)
+  $.NSWorkspace.sharedWorkspace.openURL(url)
 }
 
 function run(argv) {
@@ -55,8 +52,8 @@ function run(argv) {
   const systemSettings = Application("System Settings")
   const settingsRunning = systemSettings.running()
 
-  launchSettingsPaneInBackground("com.apple.preference.battery")
-  delay(1) // Give the pane time to load
+  launchSettingsPane("com.apple.preference.battery")
+  delay(2) // Give the pane time to load
 
   const popoverButton = Application("System Events")
     .applicationProcesses
@@ -73,6 +70,7 @@ function run(argv) {
   popoverButton.click()
   delay(0.5) // Give the popover time to open
   popoverButton.menus[0].menuItems[lpmOptionIndex].click()
+  delay(0.5) // Give the option time to register
 
   if (!settingsRunning) systemSettings.quit()
 }</string>
@@ -191,9 +189,11 @@ JSON.stringify({ items: [batteryItem, adapterItem] })</string>
 	<key>readme</key>
 	<string>## Usage
 
-Toggle Low Power Mode for your battery or power adapter via the Status Keyword (default: `lpm`).
+Toggle Low Power Mode for your battery or power adapter via the Status Keyword (default: `lpm`). System Settings will open and the setting will change automatically.
 
-![Alfred results for lpm](images/about/lpm.png)</string>
+![Alfred results for lpm](images/about/lpm.png)
+
+![System Settings Battery Pane](images/about/settings.png)</string>
 	<key>uidata</key>
 	<dict>
 		<key>09F16EEE-6DBF-4559-87E0-EBCF59F92293</key>
@@ -238,7 +238,7 @@ Toggle Low Power Mode for your battery or power adapter via the Status Keyword (
 		</dict>
 	</array>
 	<key>version</key>
-	<string>2022.8</string>
+	<string>2023.1</string>
 	<key>webaddress</key>
 	<string>https://github.com/alfredapp/low-power-mode-workflow/</string>
 </dict>
