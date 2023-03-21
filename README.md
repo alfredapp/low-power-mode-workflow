@@ -2,11 +2,11 @@
 
 Toggle Low Power Mode for Battery or Power Adapter
 
-<a href='https://alfred.app/workflows/alfredapp/low-power-mode'>⤓ Install on the Alfred Gallery</a>
+[⤓ Install on the Alfred Gallery](https://alfred.app/workflows/alfredapp/low-power-mode)
 
 ## Usage
 
-Toggle Low Power Mode for your battery or power adapter via the Status Keyword (default: `lpm`). System Settings will open and the setting will change automatically.
+Toggle Low Power Mode for your battery or power adapter via the `lpm` keyword. System Settings will open and change the preference automatically.
 
 ![Alfred results for lpm](Workflow/images/about/lpm.png)
 
