@@ -189,7 +189,7 @@ JSON.stringify({ items: [batteryItem, adapterItem] })</string>
 	<key>readme</key>
 	<string>## Usage
 
-Toggle Low Power Mode for your battery or power adapter via the Status Keyword (default: `lpm`). System Settings will open and the setting will change automatically.
+Toggle Low Power Mode for your battery or power adapter via the `lpm` keyword. System Settings will open and change the preference automatically.
 
 ![Alfred results for lpm](images/about/lpm.png)
 
