@@ -120,7 +120,7 @@ function run(argv) {
   const task = $.NSTask.alloc.init
   const stdout = $.NSPipe.pipe
 
-  task.executableURL = $.NSURL.alloc.initFileURLWithPath(arguments[0])
+  task.executableURL = $.NSURL.fileURLWithPath(arguments[0])
   task.arguments = arguments.slice(1)
   task.standardOutput = stdout
   task.launchAndReturnError(false)
