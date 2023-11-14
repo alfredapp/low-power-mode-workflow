@@ -40,46 +40,15 @@
 				<key>escaping</key>
 				<integer>68</integer>
 				<key>script</key>
-				<string>ObjC.import("AppKit")
-
-function launchSettingsPane(pane) {
-  const url = $.NSURL.URLWithString("x-apple.systempreferences:" + pane)
-  $.NSWorkspace.sharedWorkspace.openURL(url)
-}
-
-function run(argv) {
-  const lpmOptionIndex = argv[0]
-  const systemSettings = Application("System Settings")
-  const settingsRunning = systemSettings.running()
-
-  launchSettingsPane("com.apple.preference.battery")
-  delay(2) // Give the pane time to load
-
-  const popoverButton = Application("System Events")
-    .applicationProcesses
-    .byName("System Settings")
-    .windows[0]
-    .groups[0]
-    .splitterGroups[0]
-    .groups[1]
-    .groups[0]
-    .scrollAreas[0]
-    .groups[0]
-    .popUpButtons[0]
-
-  popoverButton.click()
-  delay(0.5) // Give the popover time to open
-  popoverButton.menus[0].menuItems[lpmOptionIndex].click()
-  delay(0.5) // Give the option time to register
-
-  if (!settingsRunning) systemSettings.quit()
-}</string>
+				<string>on run argv
+  do shell script "sudo /usr/bin/pmset " &amp; item 1 of argv with administrator privileges
+end run</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
 				<string></string>
 				<key>type</key>
-				<integer>7</integer>
+				<integer>6</integer>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.action.script</string>
@@ -131,16 +100,9 @@ function run(argv) {
   return stringOut
 }
 
-function lpmOptionIndex(batteryLowPowerOn, adapterLowPowerOn) {
-  if (!batteryLowPowerOn &amp;&amp; !adapterLowPowerOn) { return 0 } // Never
-  else if (batteryLowPowerOn &amp;&amp; adapterLowPowerOn) { return 1 } // Always
-  else if (batteryLowPowerOn &amp;&amp; !adapterLowPowerOn) { return 2 } // Only on Battery
-  else { return 3 } // Only on Power Adapter
-}
-
 const power = runCommand("/usr/bin/pmset", "-g", "custom")
-const batteryMatch = power.match(/(Battery) Power:.*?lowpowermode\s*(\d)\n/s)
-const adapterMatch = power.match(/(AC) Power:.*?lowpowermode\s*(\d)\n/s)
+const batteryMatch = power.match(/(Battery) Power:.*?powermode\s*(\d)\n/s)
+const adapterMatch = power.match(/(AC) Power:.*?powermode\s*(\d)\n/s)
 const batteryName = batteryMatch[1]
 const adapterName = adapterMatch[1]
 const batteryLowPowerOn = batteryMatch[2] === "1"
@@ -153,14 +115,14 @@ const adapterIcon = adapterLowPowerOn ? "images/icon_adapter_on.png" : "images/i
 const batteryItem = {
   title: batteryName + "’s Low Power Mode is " + batteryLowPowerState,
   subtitle: "Action to turn it " + batteryLowPowerState.toLowerCase(),
-  arg: lpmOptionIndex(!batteryLowPowerOn, adapterLowPowerOn),
+  arg: batteryLowPowerOn ? "-b lowpowermode 0" : "-b lowpowermode 1",
   icon: { path: batteryIcon }
 }
 
 const adapterItem = {
   title: adapterName + "’s Low Power Mode is " + adapterLowPowerState,
   subtitle: "Action to turn it " + adapterLowPowerState.toLowerCase(),
-  arg: lpmOptionIndex(batteryLowPowerOn, !adapterLowPowerOn),
+  arg: adapterLowPowerOn ? "-c lowpowermode 0" : "-c lowpowermode 1",
   icon: { path: adapterIcon }
 }
 
@@ -189,11 +151,11 @@ JSON.stringify({ items: [batteryItem, adapterItem] })</string>
 	<key>readme</key>
 	<string>## Usage
 
-Toggle Low Power Mode for your battery or power adapter via the `lpm` keyword. System Settings will open and change the preference automatically.
+Toggle Low Power Mode for your battery or power adapter via the `lpm` keyword.
 
 ![Alfred results for lpm](images/about/lpm.png)
 
-![System Settings Battery Pane](images/about/settings.png)</string>
+Manipulating power management settings is a privileged operation so you will be required to authenticate with your password.</string>
 	<key>uidata</key>
 	<dict>
 		<key>09F16EEE-6DBF-4559-87E0-EBCF59F92293</key>
