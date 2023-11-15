@@ -109,19 +109,21 @@ const batteryLowPowerOn = batteryMatch[2] === "1"
 const adapterLowPowerOn = adapterMatch[2] === "1"
 const batteryLowPowerState = batteryLowPowerOn ? "On" : "Off"
 const adapterLowPowerState = adapterLowPowerOn ? "On" : "Off"
+const batteryOppositeState = batteryLowPowerOn ? "off" : "on"
+const adapterOppositeState = adapterLowPowerOn ? "off" : "on"
 const batteryIcon = batteryLowPowerOn ? "images/icon_battery_on.png" : "images/icon_battery_off.png"
 const adapterIcon = adapterLowPowerOn ? "images/icon_adapter_on.png" : "images/icon_adapter_off.png"
 
 const batteryItem = {
   title: batteryName + "’s Low Power Mode is " + batteryLowPowerState,
-  subtitle: "Action to turn it " + batteryLowPowerState.toLowerCase(),
+  subtitle: "Action to turn it " + batteryOppositeState,
   arg: batteryLowPowerOn ? "-b lowpowermode 0" : "-b lowpowermode 1",
   icon: { path: batteryIcon }
 }
 
 const adapterItem = {
   title: adapterName + "’s Low Power Mode is " + adapterLowPowerState,
-  subtitle: "Action to turn it " + adapterLowPowerState.toLowerCase(),
+  subtitle: "Action to turn it " + adapterOppositeState,
   arg: adapterLowPowerOn ? "-c lowpowermode 0" : "-c lowpowermode 1",
   icon: { path: adapterIcon }
 }
