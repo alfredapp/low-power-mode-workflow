@@ -12,11 +12,38 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
+				<string>A055B1EB-0227-4590-BC68-DBAC387CBAE2</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>A055B1EB-0227-4590-BC68-DBAC387CBAE2</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
 				<string>09F16EEE-6DBF-4559-87E0-EBCF59F92293</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
 				<string></string>
+				<key>sourceoutputuid</key>
+				<string>42DC19B2-E3C0-456B-8BAE-99F8B55B3755</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>677D7808-A8D2-4E77-99BA-0C024BAD7528</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>sourceoutputuid</key>
+				<string>27E943A6-114C-43A2-A552-A7B80750C056</string>
 				<key>vitoclose</key>
 				<false/>
 			</dict>
@@ -115,16 +142,18 @@ const batteryIcon = batteryLowPowerOn ? "images/icon_battery_on.png" : "images/i
 const adapterIcon = adapterLowPowerOn ? "images/icon_adapter_on.png" : "images/icon_adapter_off.png"
 
 const batteryItem = {
+  variables: { battery: !batteryLowPowerOn, adapter: adapterLowPowerOn }, // System Settings method
   title: batteryName + "’s Low Power Mode is " + batteryLowPowerState,
   subtitle: "Action to turn it " + batteryOppositeState,
-  arg: batteryLowPowerOn ? "-b lowpowermode 0" : "-b lowpowermode 1",
+  arg: batteryLowPowerOn ? "-b lowpowermode 0" : "-b lowpowermode 1",     // Script method
   icon: { path: batteryIcon }
 }
 
 const adapterItem = {
+  variables: { battery: batteryLowPowerOn, adapter: !adapterLowPowerOn }, // System Settings method
   title: adapterName + "’s Low Power Mode is " + adapterLowPowerState,
   subtitle: "Action to turn it " + adapterOppositeState,
-  arg: adapterLowPowerOn ? "-c lowpowermode 0" : "-c lowpowermode 1",
+  arg: adapterLowPowerOn ? "-c lowpowermode 0" : "-c lowpowermode 1",     // Script method
   icon: { path: adapterIcon }
 }
 
@@ -149,21 +178,140 @@ JSON.stringify({ items: [batteryItem, adapterItem] })</string>
 			<key>version</key>
 			<integer>3</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>conditions</key>
+				<array>
+					<dict>
+						<key>inputstring</key>
+						<string>{var:switch_method}</string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>0</integer>
+						<key>matchstring</key>
+						<string>cli</string>
+						<key>outputlabel</key>
+						<string>Power Management</string>
+						<key>uid</key>
+						<string>42DC19B2-E3C0-456B-8BAE-99F8B55B3755</string>
+					</dict>
+					<dict>
+						<key>inputstring</key>
+						<string>{var:switch_method}</string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>0</integer>
+						<key>matchstring</key>
+						<string>gui</string>
+						<key>outputlabel</key>
+						<string>System Settings</string>
+						<key>uid</key>
+						<string>27E943A6-114C-43A2-A552-A7B80750C056</string>
+					</dict>
+				</array>
+				<key>elselabel</key>
+				<string></string>
+				<key>hideelse</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.conditional</string>
+			<key>uid</key>
+			<string>A055B1EB-0227-4590-BC68-DBAC387CBAE2</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>68</integer>
+				<key>script</key>
+				<string>ObjC.import("AppKit")
+
+// Helpers
+function envVar(varName) {
+  return $.NSProcessInfo
+    .processInfo
+    .environment
+    .objectForKey(varName).js
+}
+
+function launchSettingsPane(pane) {
+  const url = $.NSURL.URLWithString("x-apple.systempreferences:" + pane)
+  $.NSWorkspace.sharedWorkspace.openURL(url)
+}
+
+function optionIndex(battery, adapter) {
+  const batteryLowPowerOn = battery === "1"
+  const adapterLowPowerOn = adapter === "1"
+
+  if (!batteryLowPowerOn &amp;&amp; !adapterLowPowerOn) { return 0 } // Never
+  else if (batteryLowPowerOn &amp;&amp; adapterLowPowerOn) { return 1 } // Always
+  else if (batteryLowPowerOn &amp;&amp; !adapterLowPowerOn) { return 2 } // Only on Battery
+  else { return 3 } // Only on Power Adapter
+}
+
+// Main
+function run(argv) {
+  const lpmOptionIndex = optionIndex(envVar("battery"), envVar("adapter"))
+  const systemSettings = Application("System Settings")
+  const settingsRunning = systemSettings.running()
+
+  launchSettingsPane("com.apple.preference.battery")
+  delay(2) // Give the pane time to load
+
+  const popoverButton = Application("System Events")
+    .applicationProcesses
+    .byName("System Settings")
+    .windows[0]
+    .groups[0]
+    .splitterGroups[0]
+    .groups[1]
+    .groups[0]
+    .scrollAreas[0]
+    .groups[0]
+    .popUpButtons[0]
+
+  popoverButton.click()
+  delay(0.5) // Give the popover time to open
+  popoverButton.menus[0].menuItems[lpmOptionIndex].click()
+  delay(0.5) // Give the option time to register
+
+  if (!settingsRunning) systemSettings.quit()
+}</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>7</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>677D7808-A8D2-4E77-99BA-0C024BAD7528</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string>## Usage
 
 Toggle Low Power Mode for your battery or power adapter via the `lpm` keyword.
 
-![Alfred results for lpm](images/about/lpm.png)
-
-Manipulating power management settings is a privileged operation so you will be required to authenticate with your password.</string>
+![Alfred results for lpm](images/about/lpm.png)</string>
 	<key>uidata</key>
 	<dict>
 		<key>09F16EEE-6DBF-4559-87E0-EBCF59F92293</key>
 		<dict>
 			<key>xpos</key>
-			<real>250</real>
+			<real>400</real>
 			<key>ypos</key>
 			<real>40</real>
 		</dict>
@@ -175,6 +323,20 @@ Manipulating power management settings is a privileged operation so you will be 
 			<real>45</real>
 			<key>ypos</key>
 			<real>40</real>
+		</dict>
+		<key>677D7808-A8D2-4E77-99BA-0C024BAD7528</key>
+		<dict>
+			<key>xpos</key>
+			<real>400</real>
+			<key>ypos</key>
+			<real>195</real>
+		</dict>
+		<key>A055B1EB-0227-4590-BC68-DBAC387CBAE2</key>
+		<dict>
+			<key>xpos</key>
+			<real>220</real>
+			<key>ypos</key>
+			<real>60</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
@@ -199,6 +361,36 @@ Manipulating power management settings is a privileged operation so you will be 
 			<string>textfield</string>
 			<key>variable</key>
 			<string>status_keyword</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>gui</string>
+				<key>pairs</key>
+				<array>
+					<array>
+						<string>System Settings</string>
+						<string>gui</string>
+					</array>
+					<array>
+						<string>Power Management</string>
+						<string>cli</string>
+					</array>
+				</array>
+			</dict>
+			<key>description</key>
+			<string>"System Settings" opens and automates clicks in the GUI.
+It is unavailable on Apple Silicon chips which include an "Automatic" setting for Power Modes.
+
+"Power Management" does the change in the background.
+It requires authentication but is available on all chips</string>
+			<key>label</key>
+			<string>Switch Interface</string>
+			<key>type</key>
+			<string>popupbutton</string>
+			<key>variable</key>
+			<string>switch_method</string>
 		</dict>
 	</array>
 	<key>version</key>
