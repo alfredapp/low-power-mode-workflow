@@ -6,8 +6,6 @@ Toggle Low Power Mode for Battery or Power Adapter
 
 ## Usage
 
-Toggle Low Power Mode for your battery or power adapter via the `lpm` keyword. System Settings will open and change the preference automatically.
+Toggle Low Power Mode for your battery or power adapter via the `lpm` keyword.
 
 ![Alfred results for lpm](Workflow/images/about/lpm.png)
-
-![System Settings Battery Pane](Workflow/images/about/settings.png)
