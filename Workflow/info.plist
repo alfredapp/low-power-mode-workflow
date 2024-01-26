@@ -384,7 +384,7 @@ Toggle Low Power Mode for your battery or power adapter via the `lpm` keyword.
 It is unavailable on Apple Silicon chips which include an "Automatic" setting for Power Modes.
 
 "Power Management" does the change in the background.
-It requires authentication but is available on all chips</string>
+It requires authentication but is available on all chips.</string>
 			<key>label</key>
 			<string>Switch Interface</string>
 			<key>type</key>
