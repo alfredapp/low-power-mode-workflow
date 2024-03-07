@@ -374,25 +374,25 @@ Toggle Low Power Mode for your battery or power adapter via the `lpm` keyword.
 			<key>config</key>
 			<dict>
 				<key>default</key>
-				<string>gui</string>
+				<string>cli</string>
 				<key>pairs</key>
 				<array>
-					<array>
-						<string>System Settings</string>
-						<string>gui</string>
-					</array>
 					<array>
 						<string>Power Management</string>
 						<string>cli</string>
 					</array>
+					<array>
+						<string>System Settings</string>
+						<string>gui</string>
+					</array>
 				</array>
 			</dict>
 			<key>description</key>
-			<string>"System Settings" opens and automates clicks in the GUI.
-It is unavailable on Apple Silicon chips which include an "Automatic" setting for Power Modes.
+			<string>"Power Management" does the change in the background.
+It requires authentication but is available on all chips.
 
-"Power Management" does the change in the background.
-It requires authentication but is available on all chips.</string>
+"System Settings" opens and automates clicks in the GUI.
+It is unavailable on Apple Silicon chips which include an "Automatic" setting for Power Modes.</string>
 			<key>label</key>
 			<string>Switch Interface</string>
 			<key>type</key>
