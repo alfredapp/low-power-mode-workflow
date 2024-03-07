@@ -401,6 +401,8 @@ It is unavailable on Apple Silicon chips which include an "Automatic" setting fo
 			<string>switch_method</string>
 		</dict>
 	</array>
+	<key>variablesdontexport</key>
+	<array/>
 	<key>version</key>
 	<string>2024.1</string>
 	<key>webaddress</key>
