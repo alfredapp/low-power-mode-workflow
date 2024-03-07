@@ -269,21 +269,27 @@ function run(argv) {
   delay(2) // Give the pane time to load
 
   const popoverButton = Application("System Events")
-    .applicationProcesses
-    .byName("System Settings")
-    .windows[0]
-    .groups[0]
-    .splitterGroups[0]
-    .groups[1]
-    .groups[0]
-    .scrollAreas[0]
-    .groups[0]
-    .popUpButtons[0]
+    .applicationProcesses.byName("System Settings")
+    .windows.at(0)
+    .lists.at(0)
+    .splitterGroups.at(0)
+    .lists.at(1)
+    .groups.at(0)
+    .scrollAreas.at(0)
+    .groups.at(0)
+    .popUpButtons.at(0)
 
-  popoverButton.click()
-  delay(0.5) // Give the popover time to open
-  popoverButton.menus[0].menuItems[lpmOptionIndex].click()
-  delay(0.5) // Give the option time to register
+  for (let retries = 0; retries &lt; 50; retries++) {
+    delay(0.1)
+
+    try {
+      popoverButton.click()
+      delay(0.5) // Give the popover time to open
+      popoverButton.menus[0].menuItems[lpmOptionIndex].click()
+      delay(0.5) // Give the option time to register
+      break
+    } catch {}
+  }
 
   if (!settingsRunning) systemSettings.quit()
 }</string>
