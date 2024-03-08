@@ -404,7 +404,7 @@ It is unavailable on Apple Silicon chips which include an "Automatic" setting fo
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>2024.1</string>
+	<string>2024.2</string>
 	<key>webaddress</key>
 	<string>https://github.com/alfredapp/low-power-mode-workflow/</string>
 </dict>
